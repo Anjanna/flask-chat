@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nickname Submission</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+    }
+
+    #nickname-form {
+      text-align: center;
+    }
+
+    #nickname-input {
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    #submit-button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="nickname-form">
+    <label for="nickname-input">Enter Your Nickname</label>
+    <br>
+    <input type="text" id="name">
+    <br>
+    <button id="submit-button">Submit</button>
+  </div>
+
+  <script>
+    function sendPostRequest() {
+        const apiUrl = "{{url_for('chat.create_user')}}";
+        const postData = {
+          Name: document.getElementById("name").value
+        };
+        const options = {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(postData),
+        };
+        // Send the POST request
+        fetch(apiUrl, options)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Response:', data);
+                window.location.href = "{{url_for('chat.app')}}";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle errors
+            });
+    }
+    const submitButton = document.getElementById('submit-button');
+    submitButton.addEventListener('click', sendPostRequest);
+  </script>
+</body>
+</html>
