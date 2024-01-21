@@ -23,7 +23,7 @@ class ChatSession:
 
     def _create_mongo_client(self):
         uri = os.environ.get(DB_URL)
-        return MongoClient(uri, tlsInsecure=True)
+        return MongoClient(uri)
 
     def ping_db(self):
         return self.mongo_client.admin.command('ping')
