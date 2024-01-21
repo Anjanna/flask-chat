@@ -3,6 +3,7 @@ from flask import request, render_template, Blueprint, g, session
 from chat.view import ChatService
 from chat.constant.route import Endpoint, HTTP_REQUEST_METHOD
 from chat.constant.metadata import User, DB
+from chat.constant.general import USER_ID, CONTENT
 
 chatapp = Blueprint("chat", __name__, url_prefix="/chat")
 
@@ -15,7 +16,7 @@ def create_user():
         return {"success": "False"}
     service = ChatService(DB.CHAT)
     user_id = service.create_user(name)
-    session['user_id'] = user_id
+    session[USER_ID] = user_id
     return json.dumps({"success": True})
 
 def chat_app():
@@ -24,7 +25,7 @@ def chat_app():
     return render_template("chat.html", room=room, user=service.current_user)
 
 def send_message(room_id):
-    content = request.get_json().get("Content")
+    content = request.get_json().get(CONTENT)
     user_id = g.user_id
     if not room_id or not content or not user_id:
         return {"Success": False}

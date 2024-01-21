@@ -1,10 +1,11 @@
 import requests
 import json
-
+import os
+from chat.constant.general import RTDB_URL
 
 class FirebaseHelper:
     def __init__(self):
-        self.db_url = "https://chat-app-63bb3-default-rtdb.firebaseio.com/chat"
+        self.db_url = os.environ.get(RTDB_URL)
 
     def put_data(self, data, path):
         """

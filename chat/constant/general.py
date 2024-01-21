@@ -1,0 +1,4 @@
+USER_ID = "user_id"
+DB_URL = "MONGODB_URL"
+RTDB_URL = "RTDB_URL"
+CONTENT = "Content"

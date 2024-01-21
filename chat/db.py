@@ -1,4 +1,7 @@
+import os
 from pymongo.mongo_client import MongoClient
+from chat.constant.general import DB_URL
+
 
 class ChatSession:
     def __init__(self, db_name):
@@ -19,7 +22,7 @@ class ChatSession:
         return self.__doc_client
 
     def _create_mongo_client(self):
-        uri = "mongodb+srv://admin:Admin123@cluster0.ydmkr9s.mongodb.net/?retryWrites=true&w=majority"
+        uri = os.environ.get(DB_URL)
         return MongoClient(uri, tlsInsecure=True)
 
     def ping_db(self):
