@@ -27,7 +27,7 @@ class ChatService(ChatSession):
         user = self.get_doc({User.NAME: username}, Collections.USER)
         if user:
             return user[User.ID]
-        user_id = "Us" + generate_uuid(),
+        user_id = "Us" + generate_uuid()
         user = {
             User.ID: user_id,
             User.CREATED_AT: datetime.utcnow(),
