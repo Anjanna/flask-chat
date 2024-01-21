@@ -1,7 +1,7 @@
-from flask import session, g
 from chat.db import ChatSession
 from chat.util import generate_uuid
 from chat.firebase import FirebaseHelper
+from chat.constant.metadata import User, Room, Message, Collections
 from datetime import datetime
 
 class ChatService(ChatSession):
@@ -17,23 +17,25 @@ class ChatService(ChatSession):
         return self.__current_user
 
     def set_current_user(self, user_id):
-        return self.get_doc({"_id": user_id}, "User")
+        return self.get_doc({"_id": user_id}, Collections.USER)
 
     def create_user(self, username):
         """
         Creates a user in the User collection
         :param username: user nickname
         """
-        user = self.get_doc({"Name": username}, "User")
+        user = self.get_doc({User.NAME: username}, Collections.USER)
         if user:
-            return user["_id"]
+            return user[User.ID]
+        user_id = "Us" + generate_uuid(),
         user = {
-            "_id": "Us" + generate_uuid(),
-            "_created_at": datetime.utcnow(),
-            "Role": "Member",
-            "Name": username
+            User.ID: user_id,
+            User.CREATED_AT: datetime.utcnow(),
+            User.CREATED_BY: {User.ID: user_id, User.NAME: username},
+            User.ROLE: "Member",
+            User.NAME: username
         }
-        data = self.insert_one(user, "User")
+        data = self.insert_one(user, Collections.USER)
         return data.inserted_id
 
     def get_doc(self, filter_query, collection):
@@ -52,13 +54,13 @@ class ChatService(ChatSession):
         """
         user = self.current_user
         message = {
-            "_id": "Ms" + generate_uuid(),
-            "Room": room_id,
-            "_raw_data": content,
-            "_created_at": datetime.utcnow(),
-            "_created_by": {"_id": user["_id"], "Name": user["Name"]}
+            Message.ID: "Ms" + generate_uuid(),
+            Message.ROOM: room_id,
+            Message.RAW_DATA: content,
+            Message.CREATED_AT: datetime.utcnow(),
+            Message.CREATED_BY: {User.ID: user[User.ID], User.NAME: user[User.NAME]}
         }
-        self.insert_one(message, "Message")
+        self.insert_one(message, Collections.MESSAGE)
         firebase_path = f"/{room_id}"
         return FirebaseHelper().put_data(message, firebase_path)
 
@@ -69,15 +71,15 @@ class ChatService(ChatSession):
         """
         user = self.current_user
         room = {
-            "_id": "Ro" + generate_uuid(),
-            "Name": name,
-            "_created_at": datetime.utcnow(),
-            "_created_by": {"_id": user["_id"], "Name": user["Name"]}
+            Room.ID: "Ro" + generate_uuid(),
+            Room.NAME: name,
+            Room.CREATED_AT: datetime.utcnow(),
+            Room.CREATED_BY: {User.ID: user[User.ID], User.NAME: user[User.NAME]}
         }
-        return self.insert_one(room, "Room")
+        return self.insert_one(room, Collections.ROOM)
 
     def get_default_room(self):
         """
         Returns the details of the default chat room
         """
-        return self.get_doc({}, "Room")
+        return self.get_doc({}, Collections.ROOM)
